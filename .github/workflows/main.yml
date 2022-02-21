@@ -1,6 +1,9 @@
 name: auto-generate-readme
 on:
   push:
+    branches: [master]
+  pull_request:
+    branches: [master]
 
 jobs:
   auto-generate-readme:
