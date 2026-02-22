@@ -15,6 +15,7 @@ C++23 includes the following new library features:
 - [std::to_underlying](#stdto_underlying)
 - [`spanstream`](#spanstream)
 - [input/output pointers](#inputoutput-pointers)
+- [monadic operations for `std::optional`](monadic-operations-for-stdoptional)
 
 ## C++23 Language Features
 
@@ -163,6 +164,22 @@ int err = c_api_recreate_handle(std::inout_ptr(resource), resource_deleter{});
 ```
 
 Both inout/out pointers support casts to `void**` (implicitly), and explicitly to user-specified types.
+
+### Monadic operations for `std::optional`
+Support various `and_then`, `transform`, and `or_else` operations for `std::optional`.
+```c++
+std::optional<double> stringToDouble(const std::string& input) {
+    return parse_int(input)
+        .and_then(ensure_non_negative)
+        .and_then(safe_sqrt)
+        .transform([](double x) -> std::optional<double> {
+            return x * 2.0;
+        })
+        .or_else([] -> std::optional<double> {
+            throw std::runtime_error{"bad number"};
+        });
+}
+```
 
 ## Acknowledgements
 * [cppreference](http://en.cppreference.com/w/cpp) - especially useful for finding examples and documentation of new library features.
