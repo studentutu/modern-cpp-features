@@ -13,6 +13,7 @@ C++23 includes the following new library features:
 - [contains for strings and string views](#contains-for-strings-and-string-views)
 - [std::to_underlying](#stdto_underlying)
 - [`spanstream`](#spanstream)
+- [input/output pointers](#inputoutput-pointers)
 
 C++20 includes the following new language features:
 - [coroutines](#coroutines)
@@ -276,6 +277,36 @@ std::ospanstream os{std::span<char>{output}};
 os << 10 << 20 << 30;
 std::span<char> sp = os.span();
 ```
+
+### Input/output pointers
+`std::out_ptr` and `std::inout_ptr` are abstractions to support both C APIs and smart pointers by creating a temporary pointer-to-pointer that updates the smart pointer when it destructs. In short: it's a thing convertible to a `T**` that updates (with a `reset` call or semantically equivalent behavior) the smart pointer it is created with when it goes out of scope.
+
+This abstraction also safely manages the lifetime of the associated memory when exceptions are thrown.
+```c++
+// p_handle is written (out) to.
+int c_api_create_handle(MyHandle** p_handle);
+// p_handle is both read (in) and written (out) to.
+int c_api_recreate_handle(MyHandle** p_handle);
+void c_api_delete_handle(MyHandle* handle);
+
+struct resource_deleter {
+	void operator()(MyHandle* handle) {
+		c_api_delete_handle(handle);
+	}
+};
+```
+```c++
+std::unique_ptr<MyHandle, resource_deleter> resource(nullptr);
+int err = c_api_create_handle(std::out_ptr(resource));
+// `resource` now owns the memory allocated within `c_api_create_handle`.
+```
+```c++
+std::shared_ptr<MyHandle> resource(nullptr);
+int err = c_api_recreate_handle(std::inout_ptr(resource), resource_deleter{});
+// `resource` now shares the memory allocated within `c_api_recreate_handle`.
+```
+
+Both inout/out pointers support casts to `void**` (implicitly), and explicitly to user-specified types.
 
 ## C++20 Language Features
 
