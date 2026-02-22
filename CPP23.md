@@ -13,6 +13,7 @@ C++23 includes the following new library features:
 - [stacktrace library](#stacktrace-library)
 - [contains for strings and string views](#contains-for-strings-and-string-views)
 - [std::to_underlying](#stdto_underlying)
+- [`spanstream`](#spanstream)
 
 ## C++23 Language Features
 
@@ -113,6 +114,23 @@ Supports the common utility of converting an enumeration to its underlying type:
 enum class MyEnum : int { A = 1, B, C };
 std::to_underlying(MyEnum::A); // == 1
 std::to_underlying(MyEnum::C); // == 3
+```
+
+### `spanstream`
+A `strstream` replacement using a character span as an externally-provided buffer. No ownership or re-allocation on the buffer.
+```c++
+char input[] = "10 20 30";
+std::ispanstream is{std::span<char>{input}};
+int i;
+is >> i; // i == 10
+is >> i; // i == 20
+is >> i; // i == 30
+```
+```c++
+char output[30]{}; // zero-initialize array
+std::ospanstream os{std::span<char>{output}};
+os << 10 << 20 << 30;
+std::span<char> sp = os.span();
 ```
 
 ## Acknowledgements
