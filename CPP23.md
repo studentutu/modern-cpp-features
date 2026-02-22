@@ -7,7 +7,7 @@ C++23 includes the following new language features:
 - [consteval if](#consteval-if)
 - [deducing `this`](#deducing-this)
 - [multidimensional subscript operator](#multidimensional-subscript-operator)
-- [increasing range-based for safety](#increasing-range-based-for-safety)
+- [increasing range-based `for` safety](#increasing-range-based-for-safety)
 
 C++23 includes the following new library features:
 - [stacktrace library](#stacktrace-library)
